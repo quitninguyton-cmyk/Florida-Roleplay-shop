@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Florida State Roleplay | Shop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">🌴 FLORIDA STATE RP</div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#shop">Shop</a>
+    <a href="#about">About</a>
+    <a href="https://discord.com" target="_blank">Discord</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <p class="tag">OFFICIAL COMMUNITY STORE</p>
+  <h1>FLORIDA STATE<br><span>ROLEPLAY</span></h1>
+  <p>Upgrade your roleplay experience.</p>
+  <a href="#shop" class="main-btn">EXPLORE SHOP</a>
+</section>
+
+<section class="shop" id="shop">
+  <h2>OUR STORE</h2>
+  <p class="subtitle">Find your next upgrade.</p>
+
+  <div class="filters">
+    <button onclick="filterProducts('all')">All</button>
+    <button onclick="filterProducts('vehicles')">Vehicles</button>
+    <button onclick="filterProducts('vip')">VIP</button>
+    <button onclick="filterProducts('other')">Other</button>
+  </div>
+
+  <div class="products" id="products"></div>
+</section>
+
+<section class="about" id="about">
+  <h2>ABOUT OUR SHOP</h2>
+  <p>Welcome to the official Florida State Roleplay store.
+  Discover upgrades and exclusive perks for your experience.</p>
+</section>
+
+<footer>
+  <p>© 2026 Florida State Roleplay</p>
+  <p>Unofficial community store website.</p>
+</footer>
+
+<script src="products.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
