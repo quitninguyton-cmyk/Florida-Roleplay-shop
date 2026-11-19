@@ -10,14 +10,14 @@ const products = [
   {
     name: "Premium Membership",
     description: "Get access to premium benefits.",
-    price: "$10",
+    price: "$5",
     emoji: "👑",
     category: "vip"
   },
   {
-    name: "Custom Vehicle",
-    description: "Request a custom vehicle.",
-    price: "$8",
+    name: "Dono",
+    description: "help us and gain a car rng vehicle.",
+    price: "$10",
     emoji: "🚗",
     category: "vehicles"
   },
@@ -29,7 +29,7 @@ const products = [
     category: "other"
   },
   {
-    name: "Custom Role",
+    name: "Giver Painter",
     description: "Get a personalized Discord role.",
     price: "$3",
     emoji: "🎨",
@@ -39,6 +39,13 @@ const products = [
     name: "Supporter Package",
     description: "Support the community.",
     price: "$2",
+    emoji: "🌴",
+    category: "other"
+ },
+  {
+    name: "Huge Dono",
+    description: "Support Us community.",
+    price: "$15",
     emoji: "🌴",
     category: "other"
   }
