@@ -1,4 +1,4 @@
-
+L
 const productContainer = document.getElementById("products");
 
 function displayProducts(items) {
