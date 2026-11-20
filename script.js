@@ -76,15 +76,16 @@ const products = [
     price: "$20",
     emoji: "🥇",
     category: "memberships"
-  }; 
+  }
+];
 
 const productContainer = document.getElementById("products");
 
 function displayProducts(items) {
   if (!productContainer) {
-    console.error("Could not find products container!");
+    console.error("Products container not found!");
     return;
-  
+  }
 
   productContainer.innerHTML = "";
 
@@ -144,5 +145,4 @@ function filterProducts(category) {
   }
 }
 
-// Load all products when the page opens
 displayProducts(products);
