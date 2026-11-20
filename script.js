@@ -17,8 +17,11 @@ function displayProducts(items) {
     `;
 
     card.querySelector("button").addEventListener("click", () => {
-      alert("To purchase " + product.name +
-        ", please open a ticket in our Discord server!");
+      const message = product.role
+        ? `You selected ${product.name}!\n\nIncludes the ${product.role} Discord role.\n\nPlease open a ticket to purchase.`
+        : `You selected ${product.name}!\n\nPlease open a ticket in our Discord server to continue.`;
+
+      alert(message);
     });
 
     productContainer.appendChild(card);
@@ -26,13 +29,11 @@ function displayProducts(items) {
 }
 
 function filterProducts(category) {
-  if (category === "all") {
-    displayProducts(products);
-  } else {
-    displayProducts(
-      products.filter(product => product.category === category)
-    );
-  }
+  displayProducts(
+    category === "all"
+      ? products
+      : products.filter(product => product.category === category)
+  );
 }
 
 displayProducts(products);
