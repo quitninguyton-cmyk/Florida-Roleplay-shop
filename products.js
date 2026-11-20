@@ -76,5 +76,9 @@ const products = [
     price: "$20",
     emoji: "🥇",
     category: "memberships"
+    
+<script src="script.js"></script>
+</body>
+</html>
   }
 ];
