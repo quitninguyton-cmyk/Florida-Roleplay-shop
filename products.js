@@ -1,52 +1,80 @@
 
 const products = [
+  // DONATIONS
   {
-    name: "VIP Membership",
-    description: "Unlock exclusive VIP perks.",
-    price: "$5",
-    emoji: "⭐",
-    category: "Memberships"
-  },
-  {
-    name: "Premium Membership",
-    description: "Get access to premium benefits.",
-    price: "$5",
-    emoji: "👑",
-    category: "Memberships"
-  },
-  {
-    name: "Dono",
-    description: "help us and gain a car rng vehicle.",
-    price: "$10",
-    emoji: "🚗",
-    category: "Donos"
-  },
-  {
-    name: "Police Package",
-    description: "Exclusive police roleplay perks.",
-    price: "$7",
-    emoji: "🚔",
-    category: "Special"
-  },
-  {
-    name: "Giver Painter",
-    description: "Get a personalized Discord role.",
-    price: "$3",
-    emoji: "🎨",
-    category: "special"
-  },
-  {
-    name: "Supporter Package",
-    description: "Support the community.",
+    name: "Small Donation",
+    description: "A small contribution to support Florida State RP.",
     price: "$2",
-    emoji: "🏦",
-    category: "Donos"
- },
+    emoji: "💵",
+    category: "donations"
+  },
   {
-    name: "Huge Dono",
-    description: "Support Us community.",
-    price: "$15",
-    emoji: "🏦",
-    category: "Donos"
+    name: "Supporter Donation",
+    description: "Help our community grow!",
+    price: "$5",
+    emoji: "💚",
+    category: "donations"
+  },
+  {
+    name: "Big Supporter",
+    description: "Show your support with a bigger donation.",
+    price: "$10",
+    emoji: "💎",
+    category: "donations"
+  },
+  {
+    name: "Major Donation",
+    description: "A generous contribution to our community.",
+    price: "$20",
+    emoji: "🌴",
+    category: "donations"
+  },
+  {
+    name: "Legendary Donation",
+    description: "Become one of our biggest supporters!",
+    price: "$50",
+    emoji: "👑",
+    category: "donations"
+  },
+
+  // SPECIAL
+  {
+    name: "Special Supporter",
+    description: "Purchase this package and receive the Special Supporter Discord role.",
+    price: "$10",
+    emoji: "⭐",
+    category: "special",
+    role: "Special Supporter"
+  },
+  {
+    name: "Elite Supporter",
+    description: "Receive the exclusive Elite Supporter Discord role.",
+    price: "$20",
+    emoji: "🏆",
+    category: "special",
+    role: "Elite Supporter"
+  },
+
+  // MEMBERSHIPS
+  {
+    name: "Bronze Membership",
+    description: "Get started with our membership benefits.",
+    price: "$5",
+    emoji: "🥉",
+    category: "memberships"
+  },
+  {
+    name: "Silver Membership",
+    description: "Unlock more exclusive community perks.",
+    price: "$10",
+    emoji: "🥈",
+    category: "memberships"
+  },
+  {
+    name: "Gold Membership",
+    description: "Our premium membership experience!",
+    price: "$20",
+    emoji: "🥇",
+    category: "memberships"
   }
 ];
