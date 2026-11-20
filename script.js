@@ -1,6 +1,5 @@
 
 const products = [
-  // DONATIONS
   {
     name: "Small Donation",
     description: "Help support Florida State Roleplay.",
@@ -36,8 +35,6 @@ const products = [
     emoji: "👑",
     category: "donations"
   },
-
-  // SPECIAL
   {
     name: "Special Supporter",
     description: "Receive the Special Supporter Discord role.",
@@ -54,8 +51,6 @@ const products = [
     category: "special",
     role: "Elite Supporter"
   },
-
-  // MEMBERSHIPS
   {
     name: "Bronze Membership",
     description: "Start enjoying exclusive membership perks.",
@@ -76,6 +71,7 @@ const products = [
     price: "$20",
     emoji: "🥇",
     category: "memberships"
+  }
 ];
 
 const productContainer = document.getElementById("products");
