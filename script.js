@@ -76,8 +76,24 @@ const products = [
     price: "$20",
     emoji: "🥇",
     category: "memberships"
-  }
-];
+  },
+
+
+  // Partnerships 
+
+      name: "🤝Partnership-No ping",
+    description: "Start enjoying having more members.",
+    price: "$2",
+    emoji: "🤝",
+    category: "partnerships"
+  },
+  {
+name: "🤝Partnership-here ping",
+    description: "Start enjoying having alot more members.",
+    price: "$9",
+    emoji: "🤝",
+    category: "partnerships"
+  };
 
 const productContainer = document.getElementById("products");
 
@@ -85,7 +101,7 @@ function displayProducts(items) {
   if (!productContainer) {
     console.error("Could not find products container!");
     return;
-  }
+  
 
   productContainer.innerHTML = "";
 
