@@ -1,4 +1,3 @@
-
 {
   "products": [
     {
@@ -72,6 +71,15 @@
       "category": "vip",
       "description": "Elite VIP request. Staff must verify perks.",
       "stock": 10
+    },
+    {
+      "id": "custom-1795269289739",
+      "name": "20$ Support",
+      "price": 20,
+      "emoji": "🌴",
+      "category": "supporter",
+      "description": "Thanks!",
+      "stock": 99
     }
   ],
   "announcements": [
