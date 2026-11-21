@@ -2,387 +2,626 @@
 (() => {
   "use strict";
 
-  const ADMIN_PASSWORD = "Sil01Kia";
-  const DISCORD_INVITE = "fsrpnw";
-  const DISCORD_URL = "https://discord.gg/fsrpnw";
+  const DISCORD_INVITE = "https://discord.gg/fsrpnw";
 
-  const $ = id => document.getElementById(id);
+  // DEMO ONLY: This password is visible in the public JavaScript source.
+  // It is not secure protection for sensitive admin actions.
+  const DEMO_ADMIN_PASSWORD = "Sil01Kia";
 
-  function load(key, fallback) {
-    try {
-      return JSON.parse(localStorage.getItem(key)) ?? fallback;
-    } catch {
-      return fallback;
-    }
+  const $ = (id) => document.getElementById(id);
+  const STORE = "fsr_shop_v2";
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+
+  const defaults = {
+    products: clone(window.FSR_DEFAULT_PRODUCTS || []),
+    cart: [],
+    orders: [],
+    reviews: [],
+    wishlist: [],
+    points: 0,
+    announcements: [
+      {
+        title: "Welcome to Florida State Roleplay!",
+        body: "Thanks for visiting our community shop."
+      }
+    ],
+    leaderboard: [
+      { name: "Community Supporter", amount: 25 },
+      { name: "Florida Fan", amount: 10 }
+    ],
+    event: {
+      title: "Florida community event coming soon!",
+      date: "",
+      description: "Check Discord for event announcements."
+    },
+    stock: {},
+    discount: "",
+    giftCards: [],
+    referralCode: "FSR-" + Math.random().toString(36).slice(2, 8).toUpperCase()
+  };
+
+  let data;
+
+  try {
+    data = {
+      ...defaults,
+      ...JSON.parse(localStorage.getItem(STORE) || "{}")
+    };
+  } catch {
+    data = clone(defaults);
   }
 
-  function save(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+  let activeCategory = "all";
+
+  const money = n => "$" + Number(n || 0).toFixed(2);
+
+  const save = () => {
+    localStorage.setItem(STORE, JSON.stringify(data));
+  };
+
+  const escapeHTML = value =>
+    String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[c]));
+
+  let toastTimer;
+
+  function toast(message) {
+    const el = $("toast");
+    if (!el) return;
+
+    el.textContent = message;
+    el.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+      el.classList.remove("show");
+    }, 2300);
   }
 
-  function safe(value) {
-    return String(value).replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;",
-      '"': "&quot;", "'": "&#39;"
-    })[c]);
-  }
-
-  function money(value) {
-    return "$" + Number(value).toFixed(2);
-  }
-
-  let products = load("fsr_products", window.FSR_PRODUCTS || []);
-  let cart = load("fsr_cart", {});
-  let orders = load("fsr_orders", []);
-  let reviews = load("fsr_reviews", []);
-  let category = "all";
-  let discount = 0;
-  let adminLoggedIn = false;
-
-  // PRODUCTS
-  function productCard(p) {
-    return `
-      <article class="product">
-        ${p.featured ? '<span class="featured-label">★ FEATURED</span>' : ""}
-        <div class="emoji">${safe(p.emoji || "🌴")}</div>
-        <h3>${safe(p.name)}</h3>
-        <p>${safe(p.description)}</p>
-        <div class="price">${money(p.price)}</div>
-        <button class="add-cart" data-id="${safe(p.id)}">Add to Cart</button>
-      </article>
-    `;
+  function productById(id) {
+    return data.products.find(p => p.id === id);
   }
 
   function renderProducts() {
-    const query = $("searchInput").value.trim().toLowerCase();
+    const query = ($("searchInput").value || "").toLowerCase();
 
-    const filtered = products.filter(p =>
-      (category === "all" || p.category === category) &&
-      (p.name.toLowerCase().includes(query) ||
-       p.description.toLowerCase().includes(query))
+    const list = data.products.filter(p =>
+      (activeCategory === "all" || p.category === activeCategory) &&
+      (p.name + " " + p.description).toLowerCase().includes(query)
     );
 
-    $("products").innerHTML = filtered.length
-      ? filtered.map(productCard).join("")
-      : "<p>No products found.</p>";
+    $("products").innerHTML = list.length
+      ? list.map(p => `
+        <article class="product-card">
+          <div class="product-emoji">${escapeHTML(p.emoji || "🌴")}</div>
+          <h3>${escapeHTML(p.name)}</h3>
+          <p>${escapeHTML(p.description || "")}</p>
 
-    $("featuredProducts").innerHTML = products
-      .filter(p => p.featured)
-      .map(productCard).join("");
+          <div class="product-bottom">
+            <strong class="price">${money(p.price)}</strong>
+            <small class="muted">
+              ${Number(p.stock ?? 99) > 0 ? "Available" : "Out of stock"}
+            </small>
+          </div>
+
+          <div class="product-actions">
+            <button class="button primary small"
+              data-add="${escapeHTML(p.id)}"
+              ${Number(p.stock ?? 99) <= 0 ? "disabled" : ""}>
+              Add to cart
+            </button>
+
+            <button class="button ghost small" data-wish="${escapeHTML(p.id)}">
+              ${data.wishlist.includes(p.id) ? "♥ Saved" : "♡ Save"}
+            </button>
+          </div>
+        </article>
+      `).join("")
+      : '<p class="muted">No products match your search.</p>';
+
+    $("totalProducts").textContent = data.products.length;
   }
 
-  $("products").addEventListener("click", e => {
-    const button = e.target.closest(".add-cart");
-    if (button) addToCart(button.dataset.id);
-  });
-
-  $("featuredProducts").addEventListener("click", e => {
-    const button = e.target.closest(".add-cart");
-    if (button) addToCart(button.dataset.id);
-  });
-
-  $("searchInput").addEventListener("input", renderProducts);
-
-  document.querySelectorAll(".filter").forEach(button => {
-    button.addEventListener("click", () => {
-      category = button.dataset.category;
-
-      document.querySelectorAll(".filter").forEach(b =>
-        b.classList.remove("active")
-      );
-
-      button.classList.add("active");
-      renderProducts();
-    });
-  });
-
-  // CART
-  function addToCart(id) {
-    if (!products.some(p => p.id === id)) return;
-
-    cart[id] = (cart[id] || 0) + 1;
-    save("fsr_cart", cart);
-    renderCart();
-
-    $("cartPanel").hidden = false;
-    $("cartPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-
-  function totals() {
-    const subtotal = Object.entries(cart).reduce((sum, [id, qty]) => {
-      const p = products.find(item => item.id === id);
-      return sum + (p ? p.price * qty : 0);
+  function cartTotal() {
+    const subtotal = data.cart.reduce((sum, item) => {
+      return sum + (productById(item.id)?.price || 0) * item.qty;
     }, 0);
 
-    return {
-      subtotal,
-      total: subtotal * (1 - discount)
-    };
+    return Math.max(0, subtotal * (data.discount === "FSR10" ? 0.9 : 1));
   }
 
   function renderCart() {
-    const entries = Object.entries(cart).filter(([id, qty]) =>
-      products.some(p => p.id === id) && qty > 0
-    );
+    const count = data.cart.reduce((n, x) => n + x.qty, 0);
 
-    $("cartCount").textContent = entries.reduce(
-      (sum, [, qty]) => sum + qty, 0
-    );
+    $("cartCount").textContent = count;
+    $("cartStat").textContent = count;
 
-    $("cartItems").innerHTML = entries.length
-      ? entries.map(([id, qty]) => {
-          const p = products.find(item => item.id === id);
+    $("cartItems").innerHTML = data.cart.length
+      ? data.cart.map(item => {
+          const p = productById(item.id);
+          if (!p) return "";
 
           return `
             <div class="cart-item">
               <div>
-                <strong>${safe(p.name)}</strong>
-                <p>${money(p.price)} × ${qty}</p>
+                <b>${escapeHTML(p.name)}</b><br>
+                <small>${money(p.price)} each</small><br>
+                <button class="filter" data-remove="${escapeHTML(p.id)}">
+                  Remove
+                </button>
               </div>
+
               <div>
-                <button data-change="${safe(id)}" data-amount="-1">−</button>
-                ${qty}
-                <button data-change="${safe(id)}" data-amount="1">+</button>
-                <button class="secondary" data-remove="${safe(id)}">Remove</button>
+                <button class="filter" data-qty="${escapeHTML(p.id)}" data-change="-1">−</button>
+                ${item.qty}
+                <button class="filter" data-qty="${escapeHTML(p.id)}" data-change="1">+</button>
               </div>
             </div>
           `;
         }).join("")
-      : "<p>Your cart is empty.</p>";
+      : '<p class="muted">Your cart is empty.</p>';
 
-    $("cartTotal").textContent = money(totals().total);
+    $("cartTotal").textContent = money(cartTotal());
   }
 
-  $("cartItems").addEventListener("click", e => {
-    const change = e.target.closest("[data-change]");
-    const remove = e.target.closest("[data-remove]");
+  function renderWishlist() {
+    const items = data.wishlist.map(productById).filter(Boolean);
 
-    if (remove) {
-      delete cart[remove.dataset.remove];
-    }
+    $("wishlistItems").innerHTML = items.length
+      ? items.map(p => `
+        <div class="list-row">
+          ${escapeHTML(p.emoji)} ${escapeHTML(p.name)}
+          <button class="filter" data-wish="${escapeHTML(p.id)}">Remove</button>
+        </div>
+      `).join("")
+      : "Your saved products will appear here.";
+  }
 
-    if (change) {
-      const id = change.dataset.change;
-      cart[id] = (cart[id] || 0) + Number(change.dataset.amount);
-      if (cart[id] <= 0) delete cart[id];
-    }
+  function renderOrders() {
+    $("orderHistory").innerHTML = data.orders.length
+      ? data.orders.slice().reverse().map(o => `
+        <div class="list-row">
+          <b>${escapeHTML(o.id)}</b> · ${money(o.total)}<br>
+          <small>${escapeHTML(o.date)} · ${escapeHTML(o.status)}</small>
+        </div>
+      `).join("")
+      : "No saved orders yet.";
+  }
 
-    save("fsr_cart", cart);
+  function renderReviews() {
+    $("reviewsList").innerHTML = data.reviews.length
+      ? data.reviews.slice().reverse().map(r => `
+        <article class="review-item">
+          <b>${escapeHTML(r.name)}</b>
+          <span class="price">${"★".repeat(r.rating)}</span>
+          <p>${escapeHTML(r.text)}</p>
+          <small class="muted">${escapeHTML(r.date)}</small>
+        </article>
+      `).join("")
+      : '<p class="muted">No local reviews yet.</p>';
+  }
+
+  function renderCommunity() {
+    $("loyaltyPoints").textContent = data.points;
+
+    $("announcements").innerHTML = data.announcements.map(a => `
+      <div class="list-row">
+        <b>${escapeHTML(a.title)}</b><br>
+        <span class="muted">${escapeHTML(a.body)}</span>
+      </div>
+    `).join("") || "No announcements.";
+
+    $("leaderboard").innerHTML = data.leaderboard
+      .slice()
+      .sort((a, b) => b.amount - a.amount)
+      .map(x => `
+        <li>
+          ${escapeHTML(x.name)}
+          <span class="muted">— ${money(x.amount)} (display only)</span>
+        </li>
+      `).join("");
+
+    $("seasonalEvent").innerHTML = `
+      <b>${escapeHTML(data.event.title)}</b>
+      <p class="muted">${escapeHTML(data.event.description || "")}</p>
+      ${data.event.date ? `<small>${escapeHTML(data.event.date)}</small>` : ""}
+    `;
+
+    $("referralCode").textContent = data.referralCode;
+  }
+
+  function renderStockEditor() {
+    $("stockEditor").innerHTML = data.products.map(p => `
+      <label class="stock-row">
+        <span>${escapeHTML(p.name)}</span>
+        <input type="number" min="0"
+          data-stock="${escapeHTML(p.id)}"
+          value="${Number(p.stock ?? 99)}">
+      </label>
+    `).join("");
+  }
+
+  function renderAll() {
+    renderProducts();
     renderCart();
+    renderWishlist();
+    renderOrders();
+    renderReviews();
+    renderCommunity();
+    renderStockEditor();
+    save();
+  }
+
+  $("searchInput").addEventListener("input", renderProducts);
+
+  document.querySelectorAll("[data-category]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.category;
+
+      document.querySelectorAll(".filter[data-category]").forEach(b => {
+        b.classList.toggle("active", b === btn);
+      });
+
+      renderProducts();
+    });
+  });
+
+  $("products").addEventListener("click", e => {
+    const add = e.target.closest("[data-add]");
+    const wish = e.target.closest("[data-wish]");
+
+    if (add) {
+      const p = productById(add.dataset.add);
+
+      if (!p || Number(p.stock ?? 99) <= 0) return;
+
+      const row = data.cart.find(x => x.id === p.id);
+
+      if (row) row.qty++;
+      else data.cart.push({ id: p.id, qty: 1 });
+
+      renderCart();
+      save();
+      toast("Added to cart!");
+    }
+
+    if (wish) toggleWish(wish.dataset.wish);
+  });
+
+  function toggleWish(id) {
+    data.wishlist = data.wishlist.includes(id)
+      ? data.wishlist.filter(x => x !== id)
+      : [...data.wishlist, id];
+
+    renderWishlist();
+    renderProducts();
+    save();
+  }
+
+  $("wishlistItems").addEventListener("click", e => {
+    const b = e.target.closest("[data-wish]");
+    if (b) toggleWish(b.dataset.wish);
+  });
+
+  $("cartItems").addEventListener("click", e => {
+    const rem = e.target.closest("[data-remove]");
+    const q = e.target.closest("[data-qty]");
+
+    if (rem) {
+      data.cart = data.cart.filter(x => x.id !== rem.dataset.remove);
+    }
+
+    if (q) {
+      const item = data.cart.find(x => x.id === q.dataset.qty);
+
+      if (item) {
+        item.qty += Number(q.dataset.change);
+
+        if (item.qty <= 0) {
+          data.cart = data.cart.filter(x => x !== item);
+        }
+      }
+    }
+
+    renderCart();
+    save();
   });
 
   $("cartToggle").addEventListener("click", () => {
-    $("cartPanel").hidden = !$("cartPanel").hidden;
+    $("cartPanel").hidden = false;
   });
 
   $("closeCart").addEventListener("click", () => {
     $("cartPanel").hidden = true;
   });
 
-  // DISCOUNT
   $("applyDiscount").addEventListener("click", () => {
     const code = $("discountInput").value.trim().toUpperCase();
-    discount = code === "FSR10" ? 0.10 : 0;
 
-    $("discountMessage").textContent = discount
-      ? "10% discount applied!"
-      : "Invalid discount code.";
+    data.discount = code === "FSR10" ? "FSR10" : "";
+
+    $("discountMessage").textContent = data.discount
+      ? "FSR10 applied — 10% demo discount."
+      : "Invalid demo code. Try FSR10.";
 
     renderCart();
+    save();
   });
 
-  // CHECKOUT
-  $("checkoutBtn").addEventListener("click", async () => {
-    const entries = Object.entries(cart).filter(([id, qty]) =>
-      products.some(p => p.id === id) && qty > 0
-    );
-
-    if (!entries.length) {
-      alert("Your cart is empty!");
+  $("checkoutBtn").addEventListener("click", () => {
+    if (!data.cart.length) {
+      toast("Your cart is empty.");
       return;
     }
 
-    const orderId = "FSR-" + Date.now().toString().slice(-8);
-    const items = entries.map(([id, qty]) => {
-      const p = products.find(item => item.id === id);
-      return `${p.name} x${qty} - ${money(p.price * qty)}`;
-    });
-
-    const summary = [
-      `Florida State Roleplay Order ${orderId}`,
-      ...items,
-      `Total: ${money(totals().total)}`,
-      "Please help me complete this order."
-    ].join("\n");
-
-    orders.unshift({
-      id: orderId,
+    const order = {
+      id: "FSR-" + Date.now().toString().slice(-8),
       date: new Date().toLocaleString(),
-      items,
-      total: totals().total,
-      status: "Pending Discord confirmation"
-    });
+      status: "Request created — awaiting staff confirmation",
+      total: cartTotal(),
+      items: data.cart.map(x => ({
+        name: productById(x.id)?.name,
+        qty: x.qty
+      }))
+    };
 
-    save("fsr_orders", orders);
-    cart = {};
-    discount = 0;
-    save("fsr_cart", cart);
+    data.orders.push(order);
+    data.cart = [];
+    data.discount = "";
 
+    save();
     renderCart();
     renderOrders();
-    $("cartPanel").hidden = true;
 
-    try {
-      await navigator.clipboard.writeText(summary);
-      alert("Order copied! Paste it into Discord.");
-    } catch {
-      alert("Order saved on this device. Please contact staff on Discord.");
+    const body = `Hello Florida State Roleplay staff! I'd like to request this order:
+Order: ${order.id}
+${order.items.map(x => `${x.qty} x ${x.name}`).join("\n")}
+Estimated total: ${money(order.total)}
+Please tell me how to proceed.`;
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(body).catch(() => {});
     }
 
-    window.open(DISCORD_URL, "_blank", "noopener");
+    window.open(DISCORD_INVITE, "_blank", "noopener");
+
+    toast("Order request saved. Message copied if browser allowed it.");
+    $("cartPanel").hidden = true;
   });
 
-  // DISCORD COUNTS
-  async function loadDiscordStats() {
-    try {
-      const response = await fetch(
-        `https://discord.com/api/v10/invites/${DISCORD_INVITE}?with_counts=true`,
-        { cache: "no-store" }
-      );
-
-      if (!response.ok) throw new Error("Discord unavailable");
-
-      const data = await response.json();
-
-      $("totalMembers").textContent =
-        Number(data.approximate_member_count || 0).toLocaleString();
-
-      $("onlineMembers").textContent =
-        Number(data.approximate_presence_count || 0).toLocaleString();
-
-      $("serverStatus").textContent = "Online";
-    } catch {
-      $("totalMembers").textContent = "Unavailable";
-      $("onlineMembers").textContent = "Unavailable";
-      $("serverStatus").textContent = "Unavailable";
-    }
-  }
-
-  loadDiscordStats();
-  setInterval(loadDiscordStats, 300000);
-
-  // REVIEWS
-  function renderReviews() {
-    $("reviewsList").innerHTML = reviews.length
-      ? reviews.map(r => `
-          <article class="review-card">
-            <strong>${safe(r.name)}</strong>
-            <div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>
-            <p>${safe(r.text)}</p>
-            <small>${safe(r.date)}</small>
-          </article>
-        `).join("")
-      : "<p>No reviews yet. Be the first!</p>";
-  }
+  $("demoPoints").addEventListener("click", () => {
+    data.points += 10;
+    renderCommunity();
+    save();
+    toast("10 demo points added.");
+  });
 
   $("reviewForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const name = $("reviewName").value.trim();
-    const text = $("reviewText").value.trim();
-    const rating = Number($("reviewRating").value);
-
-    if (!name || !text || rating < 1 || rating > 5) return;
-
-    reviews.unshift({
-      name, text, rating,
+    data.reviews.push({
+      name: $("reviewName").value.trim(),
+      rating: Number($("reviewRating").value),
+      text: $("reviewText").value.trim(),
       date: new Date().toLocaleDateString()
     });
 
-    save("fsr_reviews", reviews);
     $("reviewForm").reset();
     renderReviews();
-    updateAdmin();
-    alert("Review saved on this device!");
+    save();
+    toast("Review saved in this browser.");
   });
 
-  // ORDERS
-  function renderOrders() {
-    $("orderHistory").innerHTML = orders.length
-      ? orders.map(o => `
-          <article class="order-card">
-            <strong>${safe(o.id)}</strong>
-            <p>${safe(o.date)}</p>
-            <p>${o.items.map(safe).join("<br>")}</p>
-            <p>Total: ${money(o.total)}</p>
-            <small>${safe(o.status)}</small>
-          </article>
-        `).join("")
-      : "<p>No orders on this device yet.</p>";
-  }
+  $("ticketForm").addEventListener("submit", e => {
+    e.preventDefault();
 
-  // ADMIN ACCESS: ONLY THIS FORM REQUIRES THE CODE
+    const msg = `Support request from ${$("ticketName").value}
+Topic: ${$("ticketTopic").value}
+${$("ticketMessage").value}`;
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(msg).catch(() => {});
+    }
+
+    window.open(DISCORD_INVITE, "_blank", "noopener");
+    toast("Support message copied if allowed. Send it in Discord.");
+  });
+
+  $("copyReferral").addEventListener("click", () => {
+    if (!navigator.clipboard?.writeText) {
+      toast("Copy is unavailable in this browser.");
+      return;
+    }
+
+    navigator.clipboard.writeText($("referralCode").textContent)
+      .then(() => toast("Referral code copied!"))
+      .catch(() => toast("Copy is unavailable in this browser."));
+  });
+
+  $("printLatest").addEventListener("click", () => {
+    const o = data.orders[data.orders.length - 1];
+
+    if (!o) {
+      toast("No order receipts yet.");
+      return;
+    }
+
+    const w = window.open("", "_blank");
+
+    if (!w) {
+      toast("Allow pop-ups to print.");
+      return;
+    }
+
+    w.document.write(`
+      <title>Receipt ${escapeHTML(o.id)}</title>
+      <h1>Florida State Roleplay — Order Request</h1>
+      <p>${escapeHTML(o.id)}</p>
+      <p>${escapeHTML(o.date)}</p>
+      <ul>
+        ${o.items.map(i => `
+          <li>${i.qty} × ${escapeHTML(i.name)}</li>
+        `).join("")}
+      </ul>
+      <h2>${money(o.total)}</h2>
+      <p>Request only — payment has not been verified.</p>
+    `);
+
+    w.document.close();
+    w.print();
+  });
+
   $("adminLoginForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    if ($("adminPassword").value === ADMIN_PASSWORD) {
-      adminLoggedIn = true;
-      $("adminLoginForm").hidden = true;
+    if ($("adminPassword").value === DEMO_ADMIN_PASSWORD) {
       $("adminDashboard").hidden = false;
-      $("adminLoginMessage").textContent = "";
-      updateAdmin();
+      $("adminLoginMessage").textContent =
+        "Demo admin tools unlocked on this device.";
+
+      renderStockEditor();
     } else {
-      $("adminLoginMessage").textContent = "Incorrect admin code.";
-      $("adminPassword").value = "";
+      $("adminLoginMessage").textContent =
+        "That demo password is incorrect.";
     }
   });
 
   $("adminLogout").addEventListener("click", () => {
-    adminLoggedIn = false;
     $("adminDashboard").hidden = true;
-    $("adminLoginForm").hidden = false;
     $("adminPassword").value = "";
-    $("adminLoginMessage").textContent = "Logged out.";
   });
 
   $("productForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    if (!adminLoggedIn) return;
-
-    const product = {
+    const p = {
       id: "custom-" + Date.now(),
       name: $("newName").value.trim(),
       price: Number($("newPrice").value),
       emoji: $("newEmoji").value.trim() || "🌴",
       category: $("newCategory").value,
-      description: $("newDescription").value.trim()
+      description: $("newDescription").value.trim(),
+      stock: 99
     };
 
-    if (!product.name || !product.description ||
-        !Number.isFinite(product.price) || product.price < 0) {
-      alert("Please enter valid product details.");
+    data.products.push(p);
+
+    $("productForm").reset();
+    renderAll();
+    toast("Product added locally.");
+  });
+
+  $("announcementForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    data.announcements.unshift({
+      title: $("announcementTitle").value.trim(),
+      body: $("announcementBody").value.trim()
+    });
+
+    $("announcementForm").reset();
+    renderCommunity();
+    save();
+    toast("Announcement saved locally.");
+  });
+
+  $("leaderboardForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    data.leaderboard.push({
+      name: $("supporterName").value.trim(),
+      amount: Number($("supporterAmount").value)
+    });
+
+    $("leaderboardForm").reset();
+    renderCommunity();
+    save();
+    toast("Leaderboard updated locally.");
+  });
+
+  $("eventForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    data.event = {
+      title: $("eventTitle").value.trim(),
+      date: $("eventDate").value,
+      description: $("eventDescription").value.trim()
+    };
+
+    renderCommunity();
+    save();
+    toast("Event saved locally.");
+  });
+
+  $("stockEditor").addEventListener("change", e => {
+    const id = e.target.dataset.stock;
+    if (!id) return;
+
+    const p = productById(id);
+
+    if (p) {
+      p.stock = Math.max(0, Number(e.target.value));
+      renderProducts();
+      save();
+    }
+  });
+
+  $("createGift").addEventListener("click", () => {
+    const amount = Number($("giftAmount").value);
+
+    if (amount <= 0) {
+      toast("Enter a gift amount first.");
       return;
     }
 
-    products.push(product);
-    save("fsr_products", products);
-    $("productForm").reset();
-    renderProducts();
-    updateAdmin();
-    alert("Product added!");
+    const code = "FSRG-" +
+      Math.random().toString(36).slice(2, 8).toUpperCase();
+
+    data.giftCards.push({
+      code,
+      amount,
+      remaining: amount
+    });
+
+    $("giftOutput").textContent =
+      `Demo code: ${code} — ${money(amount)}. This code is not securely redeemable across customers.`;
+
+    save();
   });
 
-  function updateAdmin() {
-    $("adminProducts").textContent = products.length;
-    $("adminOrders").textContent = orders.length;
-    $("adminReviews").textContent = reviews.length;
-  }
+  $("exportData").addEventListener("click", () => {
+    const blob = new Blob(
+      [JSON.stringify(data, null, 2)],
+      { type: "application/json" }
+    );
 
-  // START THE PUBLIC SHOP. NO LOGIN CHECK HERE.
-  renderProducts();
-  renderCart();
-  renderReviews();
-  renderOrders();
-  updateAdmin();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "fsr-shop-local-backup.json";
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  });
+
+  $("resetData").addEventListener("click", () => {
+    if (confirm("Reset all Florida State Roleplay shop data saved in THIS browser?")) {
+      localStorage.removeItem(STORE);
+      location.reload();
+    }
+  });
+
+  $("dailyDeal").innerHTML = `
+    <b>🌴 FSR10 — 10% demo discount</b>
+    <p class="muted">
+      Enter FSR10 in the cart. Staff must confirm any real offer.
+    </p>
+  `;
+
+  renderAll();
 })();
