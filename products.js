@@ -1,86 +1,14 @@
 
-window.FSR_PRODUCTS = [
-  {
-    id: "donation-2",
-    name: "Small Donation",
-    description: "Help support Florida State Roleplay.",
-    price: 2,
-    emoji: "💵",
-    category: "donations",
-    featured: true
-  },
-  {
-    id: "donation-5",
-    name: "Supporter Donation",
-    description: "Show your support for our community.",
-    price: 5,
-    emoji: "💚",
-    category: "donations"
-  },
-  {
-    id: "donation-10",
-    name: "Big Supporter",
-    description: "Make a bigger contribution!",
-    price: 10,
-    emoji: "💎",
-    category: "donations"
-  },
-  {
-    id: "donation-20",
-    name: "Major Donation",
-    description: "A generous contribution to our server.",
-    price: 20,
-    emoji: "🌴",
-    category: "donations"
-  },
-  {
-    id: "donation-50",
-    name: "Legendary Donation",
-    description: "Become one of our biggest supporters!",
-    price: 50,
-    emoji: "👑",
-    category: "donations"
-  },
-  {
-    id: "special-supporter",
-    name: "Special Supporter",
-    description: "Special Supporter Discord role package.",
-    price: 10,
-    emoji: "⭐",
-    category: "special",
-    featured: true
-  },
-  {
-    id: "elite-supporter",
-    name: "Elite Supporter",
-    description: "Exclusive Elite Supporter package.",
-    price: 20,
-    emoji: "🏆",
-    category: "special"
-  },
-  {
-    id: "bronze",
-    name: "Bronze Membership",
-    description: "Bronze membership package.",
-    price: 5,
-    emoji: "🥉",
-    category: "memberships"
-  },
-  {
-    id: "silver",
-    name: "Silver Membership",
-    description: "Silver membership package.",
-    price: 10,
-    emoji: "🥈",
-    category: "memberships"
-  },
-  {
-    id: "gold",
-    name: "Gold Membership",
-    description: "Premium membership package.",
-    price: 20,
-    emoji: "🥇",
-    category: "memberships",
-    featured: true
-  }
+// Edit this list to change the products shown in the shop.
+window.FSR_DEFAULT_PRODUCTS = [
+  {id:"don-2",name:"$2 Donation",price:2,emoji:"💵",category:"donation",description:"A small contribution to support the community.",stock:99,featured:true},
+  {id:"don-5",name:"$5 Donation",price:5,emoji:"💸",category:"donation",description:"Help support Florida State Roleplay.",stock:99,featured:true},
+  {id:"don-10",name:"$10 Donation",price:10,emoji:"💰",category:"donation",description:"Show extra support for the community.",stock:99,featured:false},
+  {id:"don-20",name:"$20 Donation",price:20,emoji:"💎",category:"donation",description:"A larger contribution to the server.",stock:99,featured:false},
+  {id:"don-50",name:"$50 Donation",price:50,emoji:"🏆",category:"donation",description:"Top-level community support.",stock:99,featured:false},
+  {id:"bronze",name:"Bronze Supporter",price:5,emoji:"🥉",category:"supporter",description:"Bronze supporter package. Benefits require staff confirmation.",stock:25,featured:true},
+  {id:"silver",name:"Silver Supporter",price:10,emoji:"🥈",category:"supporter",description:"Silver supporter package. Benefits require staff confirmation.",stock:25,featured:true},
+  {id:"gold",name:"Gold Supporter",price:20,emoji:"🥇",category:"supporter",description:"Gold supporter package. Benefits require staff confirmation.",stock:15,featured:false},
+  {id:"vip",name:"VIP Membership",price:10,emoji:"⭐",category:"vip",description:"VIP membership request. Staff must verify before granting perks.",stock:20,featured:false},
+  {id:"elite",name:"Elite VIP",price:20,emoji:"👑",category:"vip",description:"Elite VIP request. Staff must verify before granting perks.",stock:10,featured:false}
 ];
