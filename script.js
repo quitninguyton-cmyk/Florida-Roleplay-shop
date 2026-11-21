@@ -2,65 +2,53 @@
 const DISCORD_INVITE = "fsrpnw";
 const DISCORD_URL = "https://discord.gg/fsrpnw";
 
+// DEMO ONLY: This password is public in GitHub source code.
+const ADMIN_PASSWORD = "Sil01Kia";
+
 const defaultProducts = [
-  {id:"donation-2",name:"Small Donation",description:"Help support Florida State Roleplay.",price:2,emoji:"💵",category:"donations",featured:true},
-  {id:"donation-5",name:"Supporter Donation",description:"Show your support for our community.",price:5,emoji:"💚",category:"donations"},
-  {id:"donation-10",name:"Big Supporter",description:"Make a bigger contribution!",price:10,emoji:"💎",category:"donations"},
-  {id:"donation-20",name:"Major Donation",description:"A generous contribution to our server.",price:20,emoji:"🌴",category:"donations"},
-  {id:"donation-50",name:"Legendary Donation",description:"Become a legendary supporter!",price:50,emoji:"👑",category:"donations"},
-  {id:"special-supporter",name:"Special Supporter",description:"Receive the Special Supporter Discord role.",price:10,emoji:"⭐",category:"special",role:"Special Supporter",featured:true},
-  {id:"elite-supporter",name:"Elite Supporter",description:"Receive the exclusive Elite Supporter Discord role.",price:20,emoji:"🏆",category:"special",role:"Elite Supporter"},
-  {id:"bronze",name:"Bronze Membership",description:"Start enjoying exclusive membership perks.",price:5,emoji:"🥉",category:"memberships"},
-  {id:"silver",name:"Silver Membership",description:"Unlock additional membership benefits.",price:10,emoji:"🥈",category:"memberships"},
-  {id:"gold",name:"Gold Membership",description:"Get our premium membership experience!",price:20,emoji:"🥇",category:"memberships",featured:true}
+  {id:"donation-2",name:"Small Donation",description:"Support our community.",price:2,emoji:"💵",category:"donations",featured:true},
+  {id:"donation-5",name:"Supporter Donation",description:"Show your support.",price:5,emoji:"💚",category:"donations"},
+  {id:"donation-10",name:"Big Supporter",description:"Make a bigger contribution.",price:10,emoji:"💎",category:"donations"},
+  {id:"donation-20",name:"Major Donation",description:"A generous contribution.",price:20,emoji:"🌴",category:"donations"},
+  {id:"donation-50",name:"Legendary Donation",description:"Become a legendary supporter.",price:50,emoji:"👑",category:"donations"},
+  {id:"special-supporter",name:"Special Supporter",description:"Special Supporter role.",price:10,emoji:"⭐",category:"special",featured:true},
+  {id:"elite-supporter",name:"Elite Supporter",description:"Elite Supporter role.",price:20,emoji:"🏆",category:"special"},
+  {id:"bronze",name:"Bronze Membership",description:"Bronze membership benefits.",price:5,emoji:"🥉",category:"memberships"},
+  {id:"silver",name:"Silver Membership",description:"Silver membership benefits.",price:10,emoji:"🥈",category:"memberships"},
+  {id:"gold",name:"Gold Membership",description:"Gold membership benefits.",price:20,emoji:"🥇",category:"memberships",featured:true}
 ];
 
 const $ = id => document.getElementById(id);
-const read = (key, fallback) => {
+
+function read(key, fallback) {
   try {
-    const value = JSON.parse(localStorage.getItem(key));
-    return value ?? fallback;
+    return JSON.parse(localStorage.getItem(key)) ?? fallback;
   } catch {
     return fallback;
   }
-};
-const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-const money = amount => "$" + amount.toFixed(2);
-const safe = value => String(value).replace(/[&<>"']/g, char => ({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-})[char]);
+}
+
+function save(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function safe(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+const money = n => "$" + Number(n).toFixed(2);
 
 let products = read("fsr_products", defaultProducts);
 let cart = read("fsr_cart", {});
 let orders = read("fsr_orders", []);
 let reviews = read("fsr_reviews", []);
-let currentCategory = "all";
+let category = "all";
 let discount = 0;
 
 // PRODUCTS
-
-function renderProducts() {
-  const query = $("searchInput").value.toLowerCase();
-
-  const filtered = products.filter(product =>
-    (currentCategory === "all" || product.category === currentCategory) &&
-    (product.name.toLowerCase().includes(query) ||
-     product.description.toLowerCase().includes(query))
-  );
-
-  $("products").innerHTML = filtered.length
-    ? filtered.map(productCard).join("")
-    : "<p>No products found. Try another search.</p>";
-
-  $("featuredProducts").innerHTML = products
-    .filter(p => p.featured)
-    .map(productCard)
-    .join("");
-
-  document.querySelectorAll(".add-cart").forEach(button => {
-    button.addEventListener("click", () => addToCart(button.dataset.id));
-  });
-}
 
 function productCard(p) {
   return `
@@ -69,18 +57,43 @@ function productCard(p) {
       <div class="emoji">${safe(p.emoji || "🌴")}</div>
       <h3>${safe(p.name)}</h3>
       <p>${safe(p.description)}</p>
-      ${p.role ? `<small>Includes: ${safe(p.role)} role</small>` : ""}
-      <div class="price">${money(Number(p.price))}</div>
+      <div class="price">${money(p.price)}</div>
       <button class="primary-btn add-cart" data-id="${safe(p.id)}">
-        Add to cart
+        Add to Cart
       </button>
     </article>`;
 }
 
+function renderProducts() {
+  const query = $("searchInput").value.toLowerCase();
+
+  const filtered = products.filter(p =>
+    (category === "all" || p.category === category) &&
+    (p.name.toLowerCase().includes(query) ||
+     p.description.toLowerCase().includes(query))
+  );
+
+  $("products").innerHTML = filtered.length
+    ? filtered.map(productCard).join("")
+    : "<p>No products found.</p>";
+
+  $("featuredProducts").innerHTML = products
+    .filter(p => p.featured)
+    .map(productCard).join("");
+
+  document.querySelectorAll(".add-cart").forEach(button => {
+    button.addEventListener("click", () => addToCart(button.dataset.id));
+  });
+}
+
 document.querySelectorAll(".filter").forEach(button => {
   button.addEventListener("click", () => {
-    currentCategory = button.dataset.category;
-    document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+    category = button.dataset.category;
+
+    document.querySelectorAll(".filter").forEach(b =>
+      b.classList.remove("active")
+    );
+
     button.classList.add("active");
     renderProducts();
   });
@@ -88,11 +101,10 @@ document.querySelectorAll(".filter").forEach(button => {
 
 $("searchInput").addEventListener("input", renderProducts);
 
-// CART
+// SHOPPING CART
 
 function addToCart(id) {
-  const product = products.find(p => p.id === id);
-  if (!product) return;
+  if (!products.some(p => p.id === id)) return;
 
   cart[id] = (cart[id] || 0) + 1;
   save("fsr_cart", cart);
@@ -100,23 +112,13 @@ function addToCart(id) {
   openCart();
 }
 
-function changeQuantity(id, amount) {
-  cart[id] = (cart[id] || 0) + amount;
-  if (cart[id] <= 0) delete cart[id];
-  save("fsr_cart", cart);
-  renderCart();
-}
-
-function calculateTotal() {
-  let subtotal = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const product = products.find(p => p.id === id);
-    return sum + (product ? Number(product.price) * qty : 0);
+function total() {
+  const subtotal = Object.entries(cart).reduce((sum, [id, qty]) => {
+    const p = products.find(item => item.id === id);
+    return sum + (p ? Number(p.price) * qty : 0);
   }, 0);
 
-  return {
-    subtotal,
-    total: Math.max(0, subtotal * (1 - discount))
-  };
+  return subtotal * (1 - discount);
 }
 
 function renderCart() {
@@ -124,16 +126,17 @@ function renderCart() {
     products.some(p => p.id === id)
   );
 
-  $("cartCount").textContent = entries.reduce((sum, [,qty]) => sum + qty, 0);
+  $("cartCount").textContent = entries.reduce((s, [,q]) => s + q, 0);
 
   $("cartItems").innerHTML = entries.length
     ? entries.map(([id, qty]) => {
         const p = products.find(item => item.id === id);
+
         return `
           <div class="cart-item">
             <div>
               <strong>${safe(p.name)}</strong>
-              <p>${money(Number(p.price))} × ${qty}</p>
+              <p>${money(p.price)} × ${qty}</p>
               <button data-remove="${safe(id)}">Remove</button>
             </div>
             <div>
@@ -145,28 +148,34 @@ function renderCart() {
       }).join("")
     : "<p>Your cart is empty.</p>";
 
-  document.querySelectorAll("[data-remove]").forEach(button =>
-    button.addEventListener("click", () => {
-      delete cart[button.dataset.remove];
+  document.querySelectorAll("[data-remove]").forEach(b => {
+    b.addEventListener("click", () => {
+      delete cart[b.dataset.remove];
       save("fsr_cart", cart);
       renderCart();
-    })
-  );
+    });
+  });
 
-  document.querySelectorAll("[data-change]").forEach(button =>
-    button.addEventListener("click", () =>
-      changeQuantity(button.dataset.change, Number(button.dataset.amount))
-    )
-  );
+  document.querySelectorAll("[data-change]").forEach(b => {
+    b.addEventListener("click", () => {
+      const id = b.dataset.change;
+      cart[id] = (cart[id] || 0) + Number(b.dataset.amount);
 
-  const totals = calculateTotal();
-  $("cartTotal").textContent = money(totals.total);
+      if (cart[id] <= 0) delete cart[id];
+
+      save("fsr_cart", cart);
+      renderCart();
+    });
+  });
+
+  $("cartTotal").textContent = money(total());
 }
 
 function openCart() {
   $("cartPanel").classList.add("open");
   $("cartBackdrop").classList.add("show");
 }
+
 function closeCart() {
   $("cartPanel").classList.remove("open");
   $("cartBackdrop").classList.remove("show");
@@ -176,22 +185,20 @@ $("cartToggle").addEventListener("click", openCart);
 $("closeCart").addEventListener("click", closeCart);
 $("cartBackdrop").addEventListener("click", closeCart);
 
-// DISCOUNT CODES
+// DISCOUNTS
 
 $("applyDiscount").addEventListener("click", () => {
   const code = $("discountInput").value.trim().toUpperCase();
 
-  if (code === "FSR10") {
-    discount = 0.10;
-    $("discountMessage").textContent = "10% discount applied!";
-  } else {
-    discount = 0;
-    $("discountMessage").textContent = "Invalid discount code.";
-  }
+  discount = code === "FSR10" ? 0.10 : 0;
+
+  $("discountMessage").textContent =
+    discount ? "10% discount applied!" : "Invalid discount code.";
+
   renderCart();
 });
 
-// CHECKOUT AND LOCAL ORDER HISTORY
+// CHECKOUT
 
 $("checkoutBtn").addEventListener("click", async () => {
   const entries = Object.entries(cart).filter(([id, qty]) =>
@@ -203,33 +210,35 @@ $("checkoutBtn").addEventListener("click", async () => {
     return;
   }
 
-  const totals = calculateTotal();
-  const orderId = "FSR-" + Date.now().toString().slice(-8);
+  const id = "FSR-" + Date.now().toString().slice(-8);
 
-  const lines = entries.map(([id, qty]) => {
-    const p = products.find(item => item.id === id);
+  const items = entries.map(([pid, qty]) => {
+    const p = products.find(item => item.id === pid);
     return `${p.name} x${qty} - ${money(p.price * qty)}`;
   });
 
   const summary = [
-    `Florida State Roleplay Order: ${orderId}`,
-    ...lines,
-    `Total: ${money(totals.total)}`,
+    `Florida State Roleplay Order ${id}`,
+    ...items,
+    `Total: ${money(total())}`,
     "Please help me complete this order."
   ].join("\n");
 
+  // Open Discord immediately from the click.
+  window.open(DISCORD_URL, "_blank", "noopener");
+
   orders.unshift({
-    id: orderId,
+    id,
     date: new Date().toLocaleString(),
-    items: lines,
-    total: totals.total,
+    items,
+    total: total(),
     status: "Pending Discord confirmation"
   });
 
   save("fsr_orders", orders);
-  save("fsr_cart", {});
   cart = {};
   discount = 0;
+  save("fsr_cart", cart);
 
   renderCart();
   renderOrders();
@@ -237,24 +246,22 @@ $("checkoutBtn").addEventListener("click", async () => {
 
   try {
     await navigator.clipboard.writeText(summary);
-    alert("Order summary copied! Paste it into our Discord after joining.");
+    alert("Order copied! Paste it into Discord.");
   } catch {
-    alert("Your order was saved locally. Please contact our Discord staff.");
+    alert("Order saved locally. Please contact staff on Discord.");
   }
-
-  window.open(DISCORD_URL, "_blank", "noopener");
 });
 
-// DISCORD LIVE COUNTS
+// DISCORD STATISTICS
 
 async function loadDiscordStats() {
   try {
     const response = await fetch(
       `https://discord.com/api/v10/invites/${DISCORD_INVITE}?with_counts=true`,
-      {cache: "no-store"}
+      {cache:"no-store"}
     );
 
-    if (!response.ok) throw new Error("Discord stats unavailable");
+    if (!response.ok) throw new Error("Unavailable");
 
     const data = await response.json();
 
@@ -265,43 +272,55 @@ async function loadDiscordStats() {
       Number(data.approximate_presence_count || 0).toLocaleString();
 
     $("serverStatus").textContent = "Online";
-  } catch (error) {
+  } catch {
     $("totalMembers").textContent = "Unavailable";
     $("onlineMembers").textContent = "Unavailable";
-    $("serverStatus").textContent = "Check Discord";
-    console.error("Discord count error:", error);
+    $("serverStatus").textContent = "Unavailable";
   }
 }
 
 loadDiscordStats();
 setInterval(loadDiscordStats, 300000);
 
-// REVIEWS
+// REVIEWS - SAVED AND DISPLAYED
 
 function renderReviews() {
   $("reviewsList").innerHTML = reviews.length
     ? reviews.map(review => `
       <article class="review-card">
         <strong>${safe(review.name)}</strong>
-        <div class="stars">${"★".repeat(review.rating)}${"☆".repeat(5-review.rating)}</div>
+        <div class="stars">
+          ${"★".repeat(review.rating)}${"☆".repeat(5-review.rating)}
+        </div>
         <p>${safe(review.text)}</p>
-      </article>`).join("")
-    : "<p>No reviews yet. Be the first!</p>";
+        <small>${safe(review.date)}</small>
+      </article>
+    `).join("")
+    : "<p>No reviews yet. Be the first to leave one!</p>";
 }
 
 $("reviewForm").addEventListener("submit", event => {
   event.preventDefault();
 
+  const name = $("reviewName").value.trim();
+  const text = $("reviewText").value.trim();
+  const rating = Number($("reviewRating").value);
+
+  if (!name || !text || rating < 1 || rating > 5) return;
+
   reviews.unshift({
-    name: $("reviewName").value.trim(),
-    rating: Number($("reviewRating").value),
-    text: $("reviewText").value.trim()
+    name,
+    text,
+    rating,
+    date: new Date().toLocaleDateString()
   });
 
   save("fsr_reviews", reviews);
   $("reviewForm").reset();
   renderReviews();
   updateAdmin();
+
+  alert("Your review has been saved!");
 });
 
 // ORDER HISTORY
@@ -313,16 +332,50 @@ function renderOrders() {
         <strong>${safe(order.id)}</strong>
         <p>${safe(order.date)}</p>
         <p>${order.items.map(safe).join("<br>")}</p>
-        <p>Total: ${money(Number(order.total))}</p>
+        <p>Total: ${money(order.total)}</p>
         <small>${safe(order.status)}</small>
-      </article>`).join("")
-    : "<p>No orders on this browser yet.</p>";
+      </article>
+    `).join("")
+    : "<p>No orders yet.</p>";
 }
 
-// LOCAL ADMIN PRODUCT TOOL
+// ADMIN LOGIN
+
+let adminLoggedIn = false;
+
+$("adminLoginForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const password = $("adminPassword").value;
+
+  if (password === ADMIN_PASSWORD) {
+    adminLoggedIn = true;
+
+    $("adminLoginMessage").textContent = "Login successful!";
+    $("adminLoginForm").hidden = true;
+    $("adminDashboard").hidden = false;
+
+    updateAdmin();
+  } else {
+    $("adminLoginMessage").textContent = "Incorrect password!";
+    $("adminPassword").value = "";
+  }
+});
+
+$("adminLogout").addEventListener("click", () => {
+  adminLoggedIn = false;
+  $("adminDashboard").hidden = true;
+  $("adminLoginForm").hidden = false;
+  $("adminPassword").value = "";
+  $("adminLoginMessage").textContent = "Logged out.";
+});
+
+// ADD PRODUCTS
 
 $("productForm").addEventListener("submit", event => {
   event.preventDefault();
+
+  if (!adminLoggedIn) return;
 
   const product = {
     id: "custom-" + Date.now(),
@@ -335,7 +388,7 @@ $("productForm").addEventListener("submit", event => {
 
   if (!product.name || !product.description ||
       !Number.isFinite(product.price) || product.price < 0) {
-    alert("Please enter valid product information.");
+    alert("Enter valid product details.");
     return;
   }
 
@@ -345,8 +398,11 @@ $("productForm").addEventListener("submit", event => {
   $("productForm").reset();
   renderProducts();
   updateAdmin();
-  alert("Product added to this browser!");
+
+  alert("Product added successfully!");
 });
+
+// ADMIN STATISTICS
 
 function updateAdmin() {
   $("adminProducts").textContent = products.length;
@@ -354,7 +410,7 @@ function updateAdmin() {
   $("adminReviews").textContent = reviews.length;
 }
 
-// INITIALIZE
+// START WEBSITE
 
 renderProducts();
 renderCart();
