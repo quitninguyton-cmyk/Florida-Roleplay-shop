@@ -1,134 +1,301 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07111f">
   <title>Florida State Roleplay | Shop</title>
   <link rel="stylesheet" href="style.css">
   <script src="products.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
-<header>
-  <a class="brand" href="#home">🌴 Florida State Roleplay</a>
+<header class="site-header">
+  <a class="brand" href="#home"><span class="brand-mark">🌴</span><span>FLORIDA STATE <small>ROLEPLAY SHOP</small></span></a>
   <nav>
     <a href="#home">Home</a>
     <a href="#shop">Shop</a>
-    <a href="#reviews">Reviews</a>
-    <a href="#orders">Orders</a>
+    <a href="#deals">Deals</a>
+    <a href="#orders">My orders</a>
+    <a href="#community">Community</a>
     <a href="#admin">Admin Access</a>
-    <a href="https://discord.gg/fsrpnw" target="_blank" rel="noopener">Discord</a>
   </nav>
+  <button id="cartToggle" class="cart-button">🛒 Cart <span id="cartCount">0</span></button>
 </header>
 
 <main>
-  <section class="hero" id="home">
-    <p class="eyebrow">OFFICIAL COMMUNITY SHOP</p>
-    <h1>Welcome to <span>Florida State Roleplay</span></h1>
-    <p>Support the community and explore our available packages.</p>
-    <a class="button" href="#shop">Explore the Shop</a>
-    <div class="stats">
-      <div><strong id="totalMembers">Loading...</strong><span>Total Members</span></div>
-      <div><strong id="onlineMembers">Loading...</strong><span>Online Members</span></div>
-      <div><strong id="serverStatus">Checking...</strong><span>Discord Status</span></div>
+  <section id="home" class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">THE OFFICIAL COMMUNITY STORE</p>
+      <h1>WELCOME TO<br><span>FLORIDA STATE</span><br>ROLEPLAY</h1>
+      <p>Browse perks, supporter packages, and exclusive community extras.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#shop">Explore the shop</a>
+        <a class="button ghost" href="#community">Join our community</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <div class="palm">🌴</div>
+      <p class="panel-label">YOUR NEXT ROLEPLAY UPGRADE</p>
+      <h2>MAKE YOUR<br>EXPERIENCE<br><span>UNFORGETTABLE.</span></h2>
+      <div class="panel-line"></div>
+      <small>FLORIDA • ROLEPLAY • COMMUNITY</small>
     </div>
   </section>
 
-  <section class="section" id="featured">
-    <h2>⭐ Featured Products</h2>
-    <div class="products" id="featuredProducts"></div>
+  <section class="stats">
+    <article><strong id="totalProducts">0</strong><span>SHOP ITEMS</span></article>
+    <article><strong id="cartStat">0</strong><span>ITEMS IN YOUR CART</span></article>
+    <article><strong>24/7</strong><span>WEBSITE ACCESS</span></article>
   </section>
 
-  <section class="section" id="shop">
-    <h2>🛍️ Shop</h2>
-    <p class="muted">Find a package that works for you.</p>
-    <input id="searchInput" class="search" type="search" placeholder="Search products...">
+  <section id="shop" class="section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">FIND YOUR UPGRADE</p>
+        <h2>THE SHOP</h2>
+      </div>
+      <input id="searchInput" class="search" placeholder="Search products..." aria-label="Search products">
+    </div>
     <div class="filters">
       <button class="filter active" data-category="all">All</button>
-      <button class="filter" data-category="donations">Donations</button>
-      <button class="filter" data-category="special">Special</button>
-      <button class="filter" data-category="memberships">Memberships</button>
+      <button class="filter" data-category="donation">Donations</button>
+      <button class="filter" data-category="supporter">Supporter</button>
+      <button class="filter" data-category="vip">VIP</button>
+      <button class="filter" data-category="other">Other</button>
     </div>
-    <div class="products" id="products"></div>
+    <div id="products" class="product-grid"></div>
   </section>
 
-  <section class="section" id="cart">
-    <h2>🛒 Your Cart</h2>
-    <button class="button" id="cartToggle">Open Cart (<span id="cartCount">0</span>)</button>
-    <div id="cartPanel" class="cart-panel" hidden>
-      <button class="secondary" id="closeCart">Close Cart</button>
-      <div id="cartItems"></div>
-      <div class="discount-row">
-        <input id="discountInput" placeholder="Discount code">
-        <button class="secondary" id="applyDiscount">Apply</button>
-      </div>
-      <p id="discountMessage" class="muted"></p>
-      <h3>Total: <span id="cartTotal">$0.00</span></h3>
-      <button class="button" id="checkoutBtn">Continue to Discord Checkout</button>
+  <section id="deals" class="section deal-section">
+    <div>
+      <p class="eyebrow">LIMITED-TIME FEATURE</p>
+      <h2>DAILY DEALS</h2>
+      <p>Check back for featured offers and seasonal specials.</p>
+    </div>
+    <div id="dailyDeal" class="deal-card"></div>
+  </section>
+
+  <section class="section two-column">
+    <div class="content-card">
+      <p class="eyebrow">SAVE IT FOR LATER</p>
+      <h2>MY WISHLIST</h2>
+      <div id="wishlistItems" class="compact-list empty-state">Your saved products will appear here.</div>
+    </div>
+    <div class="content-card">
+      <p class="eyebrow">COMMUNITY REWARDS</p>
+      <h2>LOYALTY POINTS</h2>
+      <div class="points-display"><strong id="loyaltyPoints">0</strong><span>POINTS</span></div>
+      <p class="muted">Demo points are stored in this browser only. Staff must verify real purchases separately.</p>
+      <button id="demoPoints" class="button ghost small">Add demo points</button>
     </div>
   </section>
 
-  <section class="section" id="reviews">
-    <h2>⭐ Customer Reviews</h2>
-    <form id="reviewForm" class="form-card">
-      <input id="reviewName" placeholder="Your name" maxlength="40" required>
-      <select id="reviewRating" required>
-        <option value="5">5 stars</option>
-        <option value="4">4 stars</option>
-        <option value="3">3 stars</option>
-        <option value="2">2 stars</option>
-        <option value="1">1 star</option>
-      </select>
-      <textarea id="reviewText" placeholder="Write your review..." maxlength="500" required></textarea>
-      <button class="button" type="submit">Submit Review</button>
-    </form>
-    <div id="reviewsList"></div>
+  <section id="orders" class="section two-column">
+    <div class="content-card">
+      <p class="eyebrow">YOUR ACTIVITY</p>
+      <h2>ORDER HISTORY</h2>
+      <div id="orderHistory" class="compact-list empty-state">No saved orders yet.</div>
+    </div>
+    <div class="content-card">
+      <p class="eyebrow">PRINTABLE CONFIRMATION</p>
+      <h2>RECEIPTS</h2>
+      <p class="muted">Your locally saved orders can be printed as receipts. This is not proof of payment.</p>
+      <button id="printLatest" class="button ghost small">Print latest receipt</button>
+    </div>
   </section>
 
-  <section class="section" id="orders">
-    <h2>📦 Order History</h2>
-    <p class="muted">Orders shown here are saved on this device only.</p>
-    <div id="orderHistory"></div>
-  </section>
-
-  <section class="section admin-section" id="admin">
-    <h2>🔐 Admin Access</h2>
-    <p class="muted">The shop is public. Only this admin section asks for an access code.</p>
-    <form id="adminLoginForm" class="form-card">
-      <input id="adminPassword" type="password" placeholder="Admin access code" required>
-      <button class="button" type="submit">Unlock Admin Panel</button>
-    </form>
-    <p id="adminLoginMessage" role="status"></p>
-
-    <div id="adminDashboard" class="form-card" hidden>
-      <h3>Admin Dashboard</h3>
-      <p>Products: <strong id="adminProducts">0</strong></p>
-      <p>Orders: <strong id="adminOrders">0</strong></p>
-      <p>Reviews: <strong id="adminReviews">0</strong></p>
-      <h3>Add a Product</h3>
-      <form id="productForm">
-        <input id="newName" placeholder="Product name" required>
-        <input id="newPrice" type="number" min="0" step="0.01" placeholder="Price" required>
-        <input id="newEmoji" placeholder="Emoji, e.g. ⭐">
-        <select id="newCategory">
-          <option value="donations">Donations</option>
-          <option value="special">Special</option>
-          <option value="memberships">Memberships</option>
+  <section id="community" class="section two-column">
+    <div class="content-card">
+      <p class="eyebrow">NEED A HAND?</p>
+      <h2>SUPPORT TICKET</h2>
+      <form id="ticketForm" class="stack">
+        <input id="ticketName" placeholder="Your display name" required>
+        <select id="ticketTopic">
+          <option>Order question</option>
+          <option>Product question</option>
+          <option>Bug report</option>
+          <option>Other</option>
         </select>
-        <input id="newDescription" placeholder="Product description" required>
-        <button class="button" type="submit">Add Product</button>
+        <textarea id="ticketMessage" placeholder="How can our team help?" required></textarea>
+        <button class="button primary" type="submit">Prepare support message</button>
       </form>
-      <button class="secondary" id="adminLogout">Log Out</button>
+      <p class="muted">This opens Discord with a prepared message; it does not create a private ticket automatically.</p>
+    </div>
+    <div class="content-card">
+      <p class="eyebrow">BRING YOUR FRIENDS</p>
+      <h2>REFERRAL CODE</h2>
+      <p class="muted">Share your personal demo referral code. Referral rewards require staff verification.</p>
+      <div class="code-row">
+        <code id="referralCode">FSR-GUEST</code>
+        <button id="copyReferral" class="button ghost small">Copy</button>
+      </div>
+      <p id="referralStatus" class="muted"></p>
+    </div>
+  </section>
+
+  <section class="section two-column">
+    <div class="content-card">
+      <p class="eyebrow">COMMUNITY RECOGNITION</p>
+      <h2>TOP SUPPORTERS</h2>
+      <ol id="leaderboard" class="leaderboard"></ol>
+      <p class="muted">Example leaderboard. Update it manually in Admin Access.</p>
+    </div>
+    <div class="content-card">
+      <p class="eyebrow">WHAT'S HAPPENING</p>
+      <h2>ANNOUNCEMENTS</h2>
+      <div id="announcements" class="compact-list"></div>
+    </div>
+  </section>
+
+  <section class="section two-column">
+    <div class="content-card">
+      <p class="eyebrow">YOUR MEMBERSHIP</p>
+      <h2>VIP TIERS</h2>
+      <div class="tier-grid">
+        <div><b>BRONZE</b><span>Starter perks</span></div>
+        <div><b>SILVER</b><span>Extra recognition</span></div>
+        <div><b>GOLD</b><span>Premium perks</span></div>
+        <div><b>PLATINUM</b><span>Top supporter</span></div>
+      </div>
+      <p class="muted">Membership purchases and role grants must be confirmed by staff.</p>
+    </div>
+    <div class="content-card">
+      <p class="eyebrow">SEASONAL ACTIVITIES</p>
+      <h2>EVENT CENTER</h2>
+      <div id="seasonalEvent" class="event-card">🌴 Florida community event coming soon!</div>
+    </div>
+  </section>
+
+  <section class="section content-card">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">SHARE YOUR EXPERIENCE</p>
+        <h2>PRODUCT REVIEWS</h2>
+      </div>
+    </div>
+    <form id="reviewForm" class="review-form">
+      <input id="reviewName" placeholder="Display name" required>
+      <select id="reviewRating">
+        <option value="5">★★★★★ - 5</option>
+        <option value="4">★★★★ - 4</option>
+        <option value="3">★★★ - 3</option>
+        <option value="2">★★ - 2</option>
+        <option value="1">★ - 1</option>
+      </select>
+      <textarea id="reviewText" placeholder="Write a review..." required></textarea>
+      <button class="button primary">Save local review</button>
+    </form>
+    <div id="reviewsList" class="review-list"></div>
+  </section>
+
+  <section id="admin" class="section admin-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">STAFF AREA</p>
+        <h2>ADMIN ACCESS</h2>
+        <p class="muted">The shop remains public. This section is separate from customer browsing.</p>
+      </div>
+    </div>
+
+    <form id="adminLoginForm" class="admin-login">
+      <input id="adminPassword" type="password" placeholder="Demo admin password" required>
+      <button class="button primary">Unlock demo tools</button>
+    </form>
+    <p id="adminLoginMessage" class="muted" aria-live="polite"></p>
+
+    <div id="adminDashboard" hidden>
+      <div class="admin-toolbar">
+        <h3>SHOP CONTROL PANEL</h3>
+        <button id="adminLogout" class="button ghost small">Log out</button>
+      </div>
+
+      <div class="admin-grid">
+        <form id="productForm" class="content-card stack">
+          <h3>Add a product</h3>
+          <input id="newName" placeholder="Product name" required>
+          <input id="newPrice" type="number" min="0" step=".01" placeholder="Price in USD" required>
+          <input id="newEmoji" placeholder="Emoji (e.g. 🌴)" value="🌴">
+          <select id="newCategory">
+            <option value="donation">Donation</option>
+            <option value="supporter">Supporter</option>
+            <option value="vip">VIP</option>
+            <option value="other">Other</option>
+          </select>
+          <textarea id="newDescription" placeholder="Description"></textarea>
+          <button class="button primary">Add product locally</button>
+        </form>
+
+        <form id="announcementForm" class="content-card stack">
+          <h3>Post announcement</h3>
+          <input id="announcementTitle" placeholder="Announcement title" required>
+          <textarea id="announcementBody" placeholder="Announcement details" required></textarea>
+          <button class="button primary">Publish locally</button>
+        </form>
+
+        <form id="leaderboardForm" class="content-card stack">
+          <h3>Add leaderboard entry</h3>
+          <input id="supporterName" placeholder="Supporter name" required>
+          <input id="supporterAmount" type="number" min="0" placeholder="Support amount (display only)" required>
+          <button class="button primary">Add supporter</button>
+        </form>
+
+        <form id="eventForm" class="content-card stack">
+          <h3>Set seasonal event</h3>
+          <input id="eventTitle" placeholder="Event title" required>
+          <input id="eventDate" type="date">
+          <textarea id="eventDescription" placeholder="Event details"></textarea>
+          <button class="button primary">Save event</button>
+        </form>
+
+        <div class="content-card stack">
+          <h3>Stock editor</h3>
+          <p class="muted">Stock is a display-only value on this static site.</p>
+          <div id="stockEditor"></div>
+        </div>
+
+        <div class="content-card stack">
+          <h3>Gift card demo</h3>
+          <input id="giftAmount" type="number" min="1" placeholder="Gift amount">
+          <button id="createGift" class="button ghost">Generate demo gift code</button>
+          <p id="giftOutput" class="muted"></p>
+        </div>
+
+        <div class="content-card stack">
+          <h3>Manual VIP verification</h3>
+          <p class="muted">Use your normal staff process to confirm payment and grant roles in Discord. This website cannot verify either.</p>
+          <button id="exportData" class="button ghost">Export local shop data</button>
+          <button id="resetData" class="button danger">Reset this browser's shop data</button>
+        </div>
+      </div>
     </div>
   </section>
 </main>
 
+<aside id="cartPanel" class="cart-panel" hidden>
+  <div class="cart-head">
+    <h2>Your cart</h2>
+    <button id="closeCart" class="icon-button" aria-label="Close cart">✕</button>
+  </div>
+  <div id="cartItems" class="cart-items"></div>
+  <div class="discount-row">
+    <input id="discountInput" placeholder="Discount code">
+    <button id="applyDiscount" class="button ghost small">Apply</button>
+  </div>
+  <p id="discountMessage" class="muted"></p>
+  <div class="cart-total"><span>Estimated total</span><strong id="cartTotal">$0.00</strong></div>
+  <button id="checkoutBtn" class="button primary full">Create order request</button>
+  <p class="muted tiny">No payment is collected by this website. Confirm purchases with staff.</p>
+</aside>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <footer>
-  <h3>Florida State Roleplay</h3>
-  <p>Thanks for supporting our community!</p>
-  <a href="https://discord.gg/fsrpnw">Join our Discord</a>
-  <p>© 2026 Florida State Roleplay</p>
+  <div class="brand"><span class="brand-mark">🌴</span><span>FLORIDA STATE <small>ROLEPLAY SHOP</small></span></div>
+  <p>Community shop • Not affiliated with Roblox Corporation.</p>
+  <a href="https://discord.gg/fsrpnw" target="_blank" rel="noopener">Join our Discord ↗</a>
+  <p class="tiny">GitHub Pages edition — customer data is stored locally in this browser.</p>
 </footer>
 </body>
 </html>
