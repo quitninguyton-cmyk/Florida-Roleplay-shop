@@ -1,0 +1,89 @@
+
+{
+  "products": [
+    {
+      "id": "don-2",
+      "name": "$2 Donation",
+      "price": 2,
+      "emoji": "💵",
+      "category": "donation",
+      "description": "A small contribution to support the community.",
+      "stock": 99
+    },
+    {
+      "id": "don-5",
+      "name": "$5 Donation",
+      "price": 5,
+      "emoji": "💸",
+      "category": "donation",
+      "description": "Help support Florida State Roleplay.",
+      "stock": 99
+    },
+    {
+      "id": "don-10",
+      "name": "$10 Donation",
+      "price": 10,
+      "emoji": "💰",
+      "category": "donation",
+      "description": "Show extra support for the community.",
+      "stock": 99
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze Supporter",
+      "price": 5,
+      "emoji": "🥉",
+      "category": "supporter",
+      "description": "Bronze supporter package. Staff confirmation required.",
+      "stock": 25
+    },
+    {
+      "id": "silver",
+      "name": "Silver Supporter",
+      "price": 10,
+      "emoji": "🥈",
+      "category": "supporter",
+      "description": "Silver supporter package. Staff confirmation required.",
+      "stock": 25
+    },
+    {
+      "id": "gold",
+      "name": "Gold Supporter",
+      "price": 20,
+      "emoji": "🥇",
+      "category": "supporter",
+      "description": "Gold supporter package. Staff confirmation required.",
+      "stock": 15
+    },
+    {
+      "id": "vip",
+      "name": "VIP Membership",
+      "price": 10,
+      "emoji": "⭐",
+      "category": "vip",
+      "description": "VIP membership request. Staff must verify perks.",
+      "stock": 20
+    },
+    {
+      "id": "elite",
+      "name": "Elite VIP",
+      "price": 20,
+      "emoji": "👑",
+      "category": "vip",
+      "description": "Elite VIP request. Staff must verify perks.",
+      "stock": 10
+    }
+  ],
+  "announcements": [
+    {
+      "title": "Welcome to Florida State Roleplay!",
+      "body": "Thanks for visiting our community shop."
+    }
+  ],
+  "event": {
+    "title": "Florida community event coming soon!",
+    "date": "",
+    "description": "Check Discord for event announcements."
+  },
+  "leaderboard": []
+}
