@@ -1,84 +1,86 @@
 
-const products = [
-  // DONATIONS
+window.FSR_PRODUCTS = [
   {
+    id: "donation-2",
     name: "Small Donation",
-    description: "A small contribution to support Florida State RP.",
-    price: "$2",
+    description: "Help support Florida State Roleplay.",
+    price: 2,
     emoji: "💵",
-    category: "donations"
+    category: "donations",
+    featured: true
   },
   {
+    id: "donation-5",
     name: "Supporter Donation",
-    description: "Help our community grow!",
-    price: "$5",
+    description: "Show your support for our community.",
+    price: 5,
     emoji: "💚",
     category: "donations"
   },
   {
+    id: "donation-10",
     name: "Big Supporter",
-    description: "Show your support with a bigger donation.",
-    price: "$10",
+    description: "Make a bigger contribution!",
+    price: 10,
     emoji: "💎",
     category: "donations"
   },
   {
+    id: "donation-20",
     name: "Major Donation",
-    description: "A generous contribution to our community.",
-    price: "$20",
+    description: "A generous contribution to our server.",
+    price: 20,
     emoji: "🌴",
     category: "donations"
   },
   {
+    id: "donation-50",
     name: "Legendary Donation",
     description: "Become one of our biggest supporters!",
-    price: "$50",
+    price: 50,
     emoji: "👑",
     category: "donations"
   },
-
-  // SPECIAL
   {
+    id: "special-supporter",
     name: "Special Supporter",
-    description: "Purchase this package and receive the Special Supporter Discord role.",
-    price: "$10",
+    description: "Special Supporter Discord role package.",
+    price: 10,
     emoji: "⭐",
     category: "special",
-    role: "Special Supporter"
+    featured: true
   },
   {
+    id: "elite-supporter",
     name: "Elite Supporter",
-    description: "Receive the exclusive Elite Supporter Discord role.",
-    price: "$20",
+    description: "Exclusive Elite Supporter package.",
+    price: 20,
     emoji: "🏆",
-    category: "special",
-    role: "Elite Supporter"
+    category: "special"
   },
-
-  // MEMBERSHIPS
   {
+    id: "bronze",
     name: "Bronze Membership",
-    description: "Get started with our membership benefits.",
-    price: "$5",
+    description: "Bronze membership package.",
+    price: 5,
     emoji: "🥉",
     category: "memberships"
   },
   {
+    id: "silver",
     name: "Silver Membership",
-    description: "Unlock more exclusive community perks.",
-    price: "$10",
+    description: "Silver membership package.",
+    price: 10,
     emoji: "🥈",
     category: "memberships"
   },
   {
+    id: "gold",
     name: "Gold Membership",
-    description: "Our premium membership experience!",
-    price: "$20",
+    description: "Premium membership package.",
+    price: 20,
     emoji: "🥇",
-    category: "memberships"
-    
-<script src="script.js"></script>
-</body>
-</html>
+    category: "memberships",
+    featured: true
   }
 ];
